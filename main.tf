@@ -1,4 +1,4 @@
-// S3 Backend for Terraform State Management
+// S3 Backend for Terraform State Management, Assuming S3 bucket set up
 terraform {
   backend "s3" {
     bucket  = "brennan-terraform-state" # S3 bucket for storing Terraform state
@@ -30,7 +30,6 @@ resource "aws_s3_bucket" "example_bucket" {
 
   force_destroy = true # Allows deletion even if bucket has objects
 }
-
 
 # Enable Versioning for S3 Bucket
 resource "aws_s3_bucket_versioning" "example_versioning" {
