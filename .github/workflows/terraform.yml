@@ -1,5 +1,5 @@
 name: Terraform CI/CD
-
+ 
 # on: When the workflow should run
 # Triggers when push/pull requests to main branch
 on:
