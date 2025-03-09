@@ -1,10 +1,10 @@
 // S3 Backend for Terraform State Management
 terraform {
   backend "s3" {
-    bucket         = "brennan-terraform-state" # S3 bucket for storing Terraform state
-    key            = "terraform/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true # 🔹 Enable encryption for security
+    bucket  = "brennan-terraform-state" # S3 bucket for storing Terraform state
+    key     = "terraform/terraform.tfstate"
+    region  = "us-east-1"
+    encrypt = true # 🔹 Enable encryption for security
   }
 }
 
@@ -25,10 +25,10 @@ resource "aws_s3_bucket" "example_bucket" {
   bucket = "brennan-terraform-test-bucket"
 
   lifecycle {
-    prevent_destroy = false  # Allow Terraform to destroy the bucket
+    prevent_destroy = false # Allow Terraform to destroy the bucket
   }
 
-  force_destroy = true  # Allows deletion even if bucket has objects
+  force_destroy = true # Allows deletion even if bucket has objects
 }
 
 
