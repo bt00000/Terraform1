@@ -45,7 +45,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         
         - name: Terraform Apply # Only apply when pushing to main
-          if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+          if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
           run: terraform apply -auto-approve # Apply changes automatically (w/o manual approval)
           env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
