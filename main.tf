@@ -1,3 +1,13 @@
+// S3 Backend for Terraform State Management, Assuming S3 bucket set up
+terraform {
+  backend "s3" {
+    bucket  = "brennan-terraform-state" # S3 bucket for storing Terraform state
+    key     = "terraform/terraform.tfstate"
+    region  = "us-east-1"
+    encrypt = true # 🔹 Enable encryption for security
+  }
+}
+
 # Define provider (AWS)
 provider "aws" {
   region = "us-east-1"
@@ -13,6 +23,12 @@ resource "aws_instance" "example" {
 # Create S3 Bucket
 resource "aws_s3_bucket" "example_bucket" {
   bucket = "brennan-terraform-test-bucket"
+
+  lifecycle {
+    prevent_destroy = false # Allow Terraform to destroy the bucket
+  }
+
+  force_destroy = true # Allows deletion even if bucket has objects
 }
 
 # Enable Versioning for S3 Bucket
