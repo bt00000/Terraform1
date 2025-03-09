@@ -1,0 +1,51 @@
+name: Terraform CI/CD
+
+# on: When the workflow should run
+# Triggers when push/pull requests to main branch
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+permissions:
+    contents: read
+
+# jobs: Tasks it should perform
+jobs:
+    terraform:
+        name: Terraform Deployment
+        runs-on: ubuntu-latest # Runs on Ubuntu Github-hosted
+
+        steps:
+        - name: Checkout repository # Pulls latest repo code
+          uses: actions/checkout@v3
+        
+        - name: Setup Terraform # Installs Terraform
+          uses: hashicorp/setup-terraform@v2
+          with:
+            terraform_version: 1.6.0
+        
+        - name: Terraform Init # Initialize Terraform
+          run: terraform init
+
+        - name: Terraform Format # Checks format of Terraform files
+          run: terraform fmt -check
+
+        - name: Terraform Validate # Validate Terraform config for errors
+          run: terraform validate
+        
+        - name: Terraform Plan # Preview changes Terraform will make
+          run: terraform plan
+          env: 
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} # Use Github Secrets for AWS credentials
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        
+        - name: Terraform Apply # Only apply when a PR is merged into main
+          if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+          run: terraform apply -auto-approve # Apply changes automatically (w/o manual approval)
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
