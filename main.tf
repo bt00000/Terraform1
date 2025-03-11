@@ -4,7 +4,7 @@ terraform {
     bucket  = "brennan-terraform-state" # S3 bucket for storing Terraform state
     key     = "terraform/terraform.tfstate"
     region  = "us-east-1"
-    encrypt = true # 🔹 Enable encryption for security
+    encrypt = true # Enable encryption for security
   }
 }
 
