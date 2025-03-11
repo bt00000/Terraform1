@@ -3,6 +3,7 @@ terraform {
   backend "s3" {
     bucket  = "brennan-terraform-state" # S3 bucket for storing Terraform state
     key     = "terraform/terraform.tfstate"
+    dynamodb_table = "brennan-terraform-lock"
     region  = "us-east-1"
     encrypt = true # Enable encryption for security
   }
