@@ -73,9 +73,9 @@ resource "aws_subnet" "public_net" {
 # Create Second Public Subnet (for ALB)
 resource "aws_subnet" "public_net_2" {
   vpc_id                  = aws_vpc.main_vpc.id
-  cidr_block              = "10.0.2.0/24"  # Different subnet range
+  cidr_block              = "10.0.2.0/24" # Different subnet range
   map_public_ip_on_launch = true
-  availability_zone       = "us-east-1b"  # Different AZ from the first subnet
+  availability_zone       = "us-east-1b" # Different AZ from the first subnet
 
   tags = {
     Name = "public-subnet-2"
@@ -190,7 +190,7 @@ resource "aws_lb" "load_balancer" {
   name               = "web-app-lb"
   load_balancer_type = "application"
   subnets            = [aws_subnet.public_net.id, aws_subnet.public_net_2.id] # # Attach to Public Subnet, Use both subnets
-  security_groups    = [aws_security_group.alb_sg.id] # Assign ALB Security Group
+  security_groups    = [aws_security_group.alb_sg.id]                         # Assign ALB Security Group
 }
 
 
