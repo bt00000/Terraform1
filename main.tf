@@ -263,3 +263,93 @@ resource "aws_instance" "example" {
 #   value = aws_lb.load_balancer.dns_name
 #   description = "The DNS name of the Application Load Balancer"
 # }
+
+# ----------------- CREATE RDS -----------------
+# Create Private Subnet (For RDS) - Availability Zone 1
+resource "aws_subnet" "private_net_1" {
+  vpc_id                  = aws_vpc.main_vpc.id
+  cidr_block              = "10.0.3.0/24" # Different subnet range
+  map_public_ip_on_launch = false
+  availability_zone       = "us-east-1a"
+
+  tags = {
+    Name = "private-subnet-1"
+  }
+}
+
+# Create Private Subnet (For RDS) - Availability Zone 2
+resource "aws_subnet" "private_net_2" {
+  vpc_id                  = aws_vpc.main_vpc.id
+  cidr_block              = "10.0.4.0/24" # Different subnet range
+  map_public_ip_on_launch = false
+  availability_zone       = "us-east-1b"
+
+  tags = {
+    Name = "private-subnet-2"
+  }
+}
+
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  name       = "rds-subnet-group"
+  subnet_ids = [aws_subnet.private_net_1.id, aws_subnet.private_net_2.id]
+
+  tags = {
+    Name = "rds-subnet-group"
+  }
+}
+
+resource "aws_security_group" "rds_sg" {
+  vpc_id = aws_vpc.main_vpc.id
+
+  # Allow incoming MySQL/PostgreSQL connections from the Web Server Security Group
+  ingress {
+    from_port       = 5432 # Change to 3306 if using MySQL
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.web_sg.id] # Only allow access from EC2
+  }
+
+  # Allow all outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "rds-security-group"
+  }
+}
+
+variable "db_username" {
+  description = "Database username"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_password" {
+  description = "Database password"
+  type        = string
+  sensitive   = true
+}
+
+resource "aws_db_instance" "rds_instance" {
+  identifier             = "my-rds-instance"
+  engine                 = "postgres"
+  instance_class         = "db.t3.micro" # Free-tier eligible
+  allocated_storage      = 20
+  storage_encrypted      = true
+  multi_az               = true # High availability
+  username               = var.db_username
+  password               = var.db_password
+  db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  publicly_accessible    = false # Keep it private
+  skip_final_snapshot    = true  # Set false for production
+
+  tags = {
+    Name = "Private-RDS"
+  }
+}
+
